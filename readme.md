@@ -27,6 +27,10 @@ https://github.com/tensorflow/models.git
 object_detection框架提供了一些预训练的模型以加快模型训练的速度，不同的模型及检测框架的预训练模型不同，常用的模型有resnet，mobilenet以及最近google发布的nasnet，检测框架有faster_rcnn，ssd等，本次作业使用mobilenet模型ssd检测框架，其预训练模型请自行在model_zoo中查找:
 https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
 
+>ssd论文：https://arxiv.org/abs/1512.02325
+
+>mobilenet论文：https://arxiv.org/abs/1704.04861
+
 ### 结果评估
 
 学员在tinymind上的模型应满足以下条件可认为及格：
