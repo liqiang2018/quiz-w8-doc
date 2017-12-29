@@ -1,6 +1,7 @@
 #!/bin/bash
 # 查找脚本所在路径，并进入
-DIR="$( cd "$( dirname "$0"  )" && pwd  )"
+#DIR="$( cd "$( dirname "$0"  )" && pwd  )"
+DIR=$PWD
 cd $DIR
 echo current dir is $PWD
 
@@ -8,23 +9,39 @@ echo current dir is $PWD
 export PYTHONPATH=$PYTHONPATH:$DIR:$DIR/slim:$DIR/object_detection
 
 # 定义各目录
-train_dir=/output/train  # 训练目录
-checkpoint_dir=$train_dir  # 训练目录
-eval_dir=/output/eval  # 验证目录
+output_dir=/output/  # 训练目录
+dataset_dir=/data/ai100/quiz-w8/ # 数据集目录，这里是写死的，记得修改
 
-config_src=/data/ai100/quiz-w8/ssd_mobilenet_v1_pets.config  #pipline config文件源文件路径
-config_dst=/output/ssd_mobilenet_v1_pets.config  #运行中使用的pipline config文件
+train_dir=$output_dir/rain
+checkpoint_dir=$train_dir
+eval_dir=$output_dir/eval
 
-pipeline_config_path=$config_dst  # 传入训练脚本的config文件路径
+# config文件
+config=ssd_mobilenet_v1_pets.config
+pipeline_config_path=$output_dir/$config
 
-cp $config_src $config_dst  #复制源文件，因为dataset中的文件是不允许修改的，所以复制一份/到output里面
+# 先清空输出目录，本地运行会有效果，tinymind上运行这一行没有任何效果
+rm -rvf $output_dir/*
 
-for i in {0..4}  # for循环中的代码循环执行5次。这里左右边界都包含，也就是训练会执行500个step，每100个step验证一次。
+# 因为dataset里面的东西是不允许修改的，所以这里要把config文件复制一份到输出目录
+cp $DIR/$config $pipeline_config_path
+
+for i in {0..4}  # for循环中的代码执行5此，这里的左右边界都包含，也就是一共训练500个step，每100step验证一次
 do
     echo "############" $i "runnning #################"
     last=$[$i*100]
     current=$[($i+1)*100]
-    sed -i "s/^  num_steps: $last$/  num_steps: $current/g" $config_dst  # 通过num_steps控制一次训练最多100个step
-    python object_detection/train.py --train_dir=$train_dir --pipeline_config_path=$pipeline_config_path  # 启动训练
-    python object_detection/eval.py --checkpoint_dir=$checkpoint_dir --eval_dir=$eval_dir --pipeline_config_path=$pipeline_config_path  #启动验证
+    sed -i "s/^  num_steps: $last$/  num_steps: $current/g" $pipeline_config_path  # 通过num_steps控制一次训练最多100step
+
+    echo "############" $i "training #################"
+    python ./object_detection/train.py --train_dir=$train_dir --pipeline_config_path=$pipeline_config_path
+
+    echo "############" $i "evaluating, this takes a long while #################"
+    python ./object_detection/eval.py --checkpoint_dir=$checkpoint_dir --eval_dir=$eval_dir --pipeline_config_path=$pipeline_config_path
 done
+
+# 导出模型
+python ./object_detection/export_inference_graph.py --input_type image_tensor --pipeline_config_path $pipeline_config_path --trained_checkpoint_prefix $train_dir/model.ckpt-$current  --output_directory $output_dir/exported_graphs
+
+# 在test.jpg上验证导出的模型
+python ./inference.py --output_dir=$output_dir --dataset_dir=$dataset_dir

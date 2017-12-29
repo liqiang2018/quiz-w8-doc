@@ -5,15 +5,40 @@ http://edu.csdn.net/lecturer/1427
 ## 作业
 利用slim框架和object_detection框架，做一个物体检测的模型。通过这个作业，学员可以了解到物体检测模型的数据准备，训练和验证的过程。
 
+>使用tinymind进行作业的学员，为保证作业顺利进行，文件名，配置等请严格按照本文档要求。
+
 ### 数据集
-本数据集拥有5个分类，共150张图片，每张图片都做了标注，标注数据格式与voc数据集相同。数据地址如下：
+
+>本次作业使用我们已经准备好的数据集即可，自行制作数据集作为练习项目。
+
+#### 自行制作数据集
+数据集制作分以下步骤：
+- 确定要识别的物体，需要把待识别的物体进行分类，类与类之间要有比较明显的区别特征，比如苹果和香蕉就是两个比较好的分类，而橘子和橙子就不是两个比较好的分类。
+- 采集图片，根据不同的目的，可以采用不同方式对数据进行采集。比如针对一些常见类别，可以直接使用imagenet，coco等已经标定好的数据集，取出需要的分类即可。如果有特定的场景需求，可以针对特定场景需求对图片进行采集，要求要尽量覆盖所有的应用场景。
+- 图片筛选和预处理，需要将图片中不含有待识别物体或者图片很不清晰的去掉。另外相机或者手机拍的图片，尺寸都比较大，建议将图片缩放到1080x720像素或者更低，这样可以避免训练框架运行的时候出现内存不足的问题。
+- 数据标定，使用LableImg工具进行，具体内容阅读一下LabelImg的文档就可以。需要注意数据集的labels文件需要提前准备好，LabelImg有默认的labels设置，不指定的话，在标定的过程中输入labels比较容易出错。
+- 数据整理，将标定好的数据xml和jpg分开存放。推荐按照voc的层级格式存放，图片放到images下面，xml文件放到annotations/xmls下面。
+
+>LabelImg工具地址：https://github.com/tzutalin/labelImg.git
+>需要注意LabelImg工具对中文的支持不是很好，label尽量使用英文。
+
+
+#### 使用已经准备好的数据集
+这里已经准备好了一个数据集，拥有5个分类，共150张图片，每张图片都做了标注，标注数据格式与voc数据集相同。数据地址如下：
 https://gitee.com/ai100/quiz-w8-data.git
+
+数据集中的物品分类如下：
+- computer
+- monitor
+- scuttlebutt
+- water dispenser
+- drawer chest
+
 
 数据集中各目录如下
 - images， 图片目录，数据集中所有图片都在这个目录下面。
 - annotations/xmls, 针对图片中的物体，使用LabelImg工具标注产生的xml文件都在这里，每个xml文件对应一个图片文件，每个xml文件里面包含图片中多个物体的位置和种类信息。
 
->LabelImg工具地址：https://github.com/tzutalin/labelImg.git
 
 ### 代码
 本次代码使用tensorflow官方代码，代码地址如下：
@@ -31,20 +56,23 @@ https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc
 
 >mobilenet论文：https://arxiv.org/abs/1704.04861
 
+### 模型的导出和验证
+参考**要点提示**中的内容
+
 ### 结果评估
 
 学员在tinymind上的模型应满足以下条件可认为及格：
 
 #### 数据准备完成
-学员的模型引用的数据集中，应包含以下文件，文件名可能会有所区别，但是至少会有这些文件
-- checkpoint  预训练模型相关文件
+学员的模型引用的数据集中，应包含以下文件，文件名需要跟此处文件名一致。
 - model.ckpt.data-00000-of-00001  预训练模型相关文件
 - model.ckpt.index  预训练模型相关文件
 - model.ckpt.meta  预训练模型相关文件
 - labels_items.txt  数据集中的label_map文件
 - pet_train.record  数据准备过程中，从原始数据生成的tfrecord格式的数据
 - pet_val.record  数据准备过程中，从原始数据生成的tfrecord格式的数据
-- ssd_mobilenet_v1_pets.config  piplineconfig文件
+- test.jpg  验证图片，取任意一张训练集图片即可
+- ssd_mobilenet_v1_pets.config  配置文件
 #### 训练过程正常运行并结束
 出现以下log，没有明显异常退出的提示，没有明显错误：
 ```
@@ -65,11 +93,9 @@ INFO:tensorflow:global step 18: loss = 9.4556 (0.219 sec/step)
 > log中出现的 deprecated WARNING，  tried to allocate 0 bytes， Request to allocate 0 bytes等内容属于框架本身的msg，不影响训练过程。
 #### 验证有结果输出
 scalars有各个分类和平均AP输出。
-图表界面中，有输出结果，images能输出有如下标定框的图片：
+输出结果的output文件夹中的output.png图片内容如下。
 ![individualImage.png](individualImage.png)
 > 本作业只要框架能正确运行并输出就可以认为及格，对输出准确率不做要求。
-
-
 
 ## 要点提示
 本作业为开放性作业，不提供写好的代码，所有内容均由学员自己查资料完成。为避免学员因对流程的不熟悉浪费太多的时间，这里提供一些关键流程的要点提示。本作业主要参考：
@@ -98,16 +124,16 @@ https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc
 #### 生成数据
 执行数据生成脚本
 ```
-python object_detection/dataset_tools/create_data.py --lbel_map_path=/path/to/labels_items.txt --data_dir=/path/to/data --output_dir=/path/to/out
+python object_detection/dataset_tools/create_data.py --label_map_path=/path/to/labels_items.txt --data_dir=/path/to/data --output_dir=/path/to/out
 ```
 
 执行完后，会在/path/to/out下面生成两个.record文件。
 - name_train.record
 - name_val.record
-> **name**为指定的输出文件前缀，如果没改的话，应该是**pet**，作业中不建议学员修改输出文件名，直接使用原始文件名即可。
+> **name**为指定的输出文件前缀，如果没改的话，应该是**pet**，本次作业中不要修改输出文件名，直接使用原始文件名即可。
 
 #### 编辑pipline.config文件
-以models/research/object_detection/samples/configs/ssd_mobilenet_v1_pets.config为基础进行修改。
+以models/research/object_detection/samples/configs/ssd_mobilenet_v1_pets.config为基础进行修改。本文档所在仓库也提供了这个文件。
 这个文件里面放了训练和验证过程的所有参数的配置，包括各种路径，各种训练参数（学习率，decay，batch_size等）。有这个文件，命令行上面可以少写很多参数，避免命令行内容太多。
 
 注意要点：
@@ -116,26 +142,37 @@ python object_detection/dataset_tools/create_data.py --lbel_map_path=/path/to/la
 - PATH_TO_BE_CONFIGURED，这个是原文件中预留的字段，一共5个，分别包含预训练模型的位置，训练集数据和label_map文件位置，验证集数据和label_map文件位置。这个字段需要将数据以及配置文件等上传到tinymind之后才能确定路径的具体位置，不过tinymind支持覆盖上传，所以可以先将数据上传，再根据数据在tinymind上的路径修改配置文件，路径可以在创建模型的时候，在添加数据集的地方找到。
 - num_steps，这个是训练多少step，后面的训练启动脚本会用到这个字段，直接将原始的200000改成0.注意不要添加或者删除空格等，后面的训练启动脚本使用sed对这个字段进行检测替换，如果改的有问题会影像训练启动脚本的执行。
 - max_evals，这个是验证每次跑几轮，这里直接改成1即可，即每个训练验证循环只跑一次验证。
+- eval_input_reader 里面的shuffle， 这个是跟eval步骤的数据reader有关，如果不使用GPU进行训练的话，这里需要从false改成true，不然会导致错误，详细内容参阅 https://github.com/tensorflow/models/issues/1936
 
 >训练和验证过程次数相关的参数，后面在训练启动脚本中会自动进行处理，这里不需要过多关注，但是实际使用的时候，需要对这些参数进行合适的设置，比如**num_steps**参数，后面的训练启动脚本中，每轮运行100个step，同时根据数据集图片总数all_images_count和batch_size的大小，可以计算出epoch的数量，最后输出模型的质量与epoch的数量密切相关。epoch=num_step*batch_size/all_images_count。具体的计算留给学员自己进行。
 
 #### 数据上传
 请学员自行在自己的tinymind账户中建立数据集。tinymind一个数据集中可以有多个不同用途的文件，这里要求学员将模型用到的所有文件，训练数据，配置，label_map等都放到一个数据集中，便于模型的使用以及助教对作业结果的判断。
 
-### 训练系统脚本 run.sh
-由于本作业中使用的框架，训练和验证分别在两个进程中执行，而tinymind目前不支持这种方式运作，所以这里提供一个训练启动脚本，来顺序执行训练和验证过程。训练启动脚本内容参考本仓库中的附件**run.sh**，以及其中的注释。脚本的内容涉及linuxshell编程，超出本课程教授范围，不做详细解释，感兴趣的学员请自行分析脚本内容。
-
-这个脚本需要放到models/research目录，与object_detection和slim平行。
+>注意拿一张训练的图片作为测试图片重命名为test.jpg放到数据集里面，便于后面的模型测试过程。
 
 ### 训练代码
 训练代码不需要做任何修改，只把本作业提供的训练启动脚本加入训练代码响应目录就可以。因为models目录包含了大量与本次作业无关的代码，可以适当的删除一些东西，仅保留models/research下面的object_detection和slim目录就可以。
 
-### 模型建立
-上一步将训练启动脚本加入代码之后，将训练的所有代码压缩城zip包，在建立模型的时候，使用压缩包方式上传代码。模型运行环境为python3.6/Tensorflow1.3，模型代码载入点为models/research/run.sh。
+### 训练系统脚本 run.sh
+由于本作业中使用的框架，训练和验证分别在两个进程中执行，而tinymind目前不支持这种方式运作，所以这里提供一个训练启动脚本，来顺序执行训练和验证过程，并在训练结束的时候自动导出模型并验证导出模型的效果。训练启动脚本内容参考本仓库中的附件**run.sh**，以及其中的注释。脚本的内容涉及linuxshell编程，超出本课程教授范围，不做详细解释，感兴趣的学员请自行分析脚本内容。
 
+>inference.py参考 https://github.com/tensorflow/models/blob/master/research/object_detection/object_detection_tutorial.ipynb
+模型验证使用这里提供的inference.py脚本，请将这个脚本和run.sh一起放到models/research目录，与object_detection和slim平行。
+
+>注意修改run.sh中的数据集目录为自己的数据集目录。
+
+**按照训练脚本的设定，每次运行只会运行100个step，每次验证只会运行一次，训练和验证循环执行，如果出现某次训练超过100个step，或者验证过程卡住迟迟不退出，则说明config文件的配置有问题**
+
+>由于tinymind目前对sh脚本的启动支持不好，这里提供了一个run.py脚本作为模型的入口。这个脚本会启动run.sh脚本。
+
+### 模型建立
+上一步将训练启动脚本加入代码之后，将代码上传到github，使用github方式建立模型。模型运行环境为python3.6/Tensorflow1.4，模型代码载入点为research/run.py。
+
+>tinyming目前对压缩包的方式支持有问题，本次作业无法通过压缩包方式上传代码。
 tinymind运行模型的时候，会自动将上传的压缩包解压到/tinysrc/目录，所以压缩包的路径也会影像代码的载入点路径。路径问题训练启动脚本已经做过相关处理，如果仍然出现找不到module或者文件问题，请自行尝试修改训练启动脚本，或者直接修改训练代码。
 
 ### 模型运行
-代码建立之后，模型可以开始运行，运行结果会在log中显示，如果没有出现明显的错误，那么运行应该很快会结束（1小时以内）。运行结束之后可以查看图表Tab和输出Tab，对运行的结果进行判断。
+代码建立之后，模型可以开始运行，运行结果会在log中显示，如果没有出现明显的错误，那么运行应该很快会结束（1小时以内）。运行结束之后可以查看图表Tab和输出log，同时/output文件夹里面会生成output.png，可以据此对运行的结果进行判断。
 
-本次作业中，模型的各个参数都使用默认的，所以训练的结果应该会比较好，各个分类的AP（Average Precision）应该都在80%以上，标定的结果也会比较准确。不过本次作业对AP等指标不做任何要求，只要训练正常完成即可认为作业成功完成。
+本次作业中，模型的各个参数都使用默认的，场景比较单一，所以训练的结果应该会比较好，各个分类的AP（Average Precision）应该都在80%以上，标定的结果也会比较准确。不过本次作业对AP等指标不做任何要求，只要训练正常完成即可认为作业成功完成。
