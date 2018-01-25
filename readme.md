@@ -188,3 +188,19 @@ tinymind运行模型的时候，会自动将上传的压缩包解压到/tinysrc/
 ### windows相关问题
 
 - windows 命令行不支持 * 操作符。
+
+### 本地运行的命令行
+
+```sh
+# 本地运行训练
+python ./object_detection/train.py --train_dir=/path/to/train_dir --pipeline_config_path=/path/to/pipeline_config_file
+
+#本地运行验证，注意这里的checkpoint就是训练时候的train_dir,验证的结果放在eval_dir，可以通过tensorboard看
+python ./object_detection/eval.py --checkpoint_dir=/path/to/train_dir --eval_dir=/path/to/eval_dir --pipeline_config_path=/path/to/pipeline_config_file
+
+# 导出训练好的模型，这里注意trained_checkpoint_prefix的参数是个前缀，不是一个文件名，这个参数代表的是三个文件以这个参数值开头的文件，最后的last_chekpoint_number是一个数字
+python ./object_detection/export_inference_graph.py --input_type image_tensor --pipeline_config_path /path/to/pipeline_config_file --trained_checkpoint_prefix /path/to/train_dir/model.ckpt-[last_chekpoint_number] --output_directory /path/to/output_dir/exported_graphs
+
+# 用导出的模型运行inference，详情参考代码
+python ./inference.py --output_dir=/path/to/output_dir --dataset_dir=/path/to/dataset_dir
+```
