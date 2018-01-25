@@ -204,3 +204,5 @@ python ./object_detection/export_inference_graph.py --input_type image_tensor --
 # 用导出的模型运行inference，详情参考代码
 python ./inference.py --output_dir=/path/to/output_dir --dataset_dir=/path/to/dataset_dir
 ```
+
+>命令行中，等号与空格的方式都可以指定参数的值，两种方式在大部分linux命令行程序中是等价的。
