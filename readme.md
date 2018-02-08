@@ -74,7 +74,6 @@ https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc
 - pet_train.record  数据准备过程中，从原始数据生成的tfrecord格式的数据
 - pet_val.record  数据准备过程中，从原始数据生成的tfrecord格式的数据
 - test.jpg  验证图片，取任意一张训练集图片即可
-- ssd_mobilenet_v1_pets.config  配置文件
 #### 训练过程正常运行并结束
 出现以下log，没有明显异常退出的提示，没有明显错误：
 ```
@@ -147,13 +146,14 @@ python object_detection/dataset_tools/create_data.py --label_map_path=/path/to/l
 注意要点：
 - num_classes， 原文件里面为37,这里的数据集为5
 - num_examples， 这个是验证集中有多少数量的图片，请根据图片数量和数据准备脚本中的生成规则自行计算。
-- PATH_TO_BE_CONFIGURED，这个是原文件中预留的字段，一共5个，分别包含预训练模型的位置，训练集数据和label_map文件位置，验证集数据和label_map文件位置。这个字段需要将数据以及配置文件等上传到tinymind之后才能确定路径的具体位置，不过tinymind支持覆盖上传，所以可以先将数据上传，再根据数据在tinymind上的路径修改配置文件，路径可以在创建模型的时候，在添加数据集的地方找到。
+- PATH_TO_BE_CONFIGURED，这个是原文件中预留的字段，一共5个，分别包含预训练模型的位置，训练集数据和label_map文件位置，验证集数据和label_map文件位置。这个字段需要将数据以及配置文件等上传到tinymind之后才能确定路径的具体位置。
 - num_steps，这个是训练多少step，后面的训练启动脚本会用到这个字段，直接将原始的200000改成0.注意不要添加或者删除空格等，后面的训练启动脚本使用sed对这个字段进行检测替换，如果改的有问题会影像训练启动脚本的执行。不通过run.sh本地运行需要将这个数字改成一个合适的step数，改成0的话会有问题。
 - max_evals，这个是验证每次跑几轮，这里直接改成1即可，即每个训练验证循环只跑一次验证。
 - eval_input_reader 里面的shuffle， 这个是跟eval步骤的数据reader有关，如果不使用GPU进行训练的话，这里需要从false改成true，不然会导致错误，详细内容参阅 https://github.com/tensorflow/models/issues/1936
 
 >训练和验证过程次数相关的参数，后面在训练启动脚本中会自动进行处理，这里不需要过多关注，但是实际使用的时候，需要对这些参数进行合适的设置，比如**num_steps**参数，后面的训练启动脚本中，每轮运行100个step，同时根据数据集图片总数all_images_count和batch_size的大小，可以计算出epoch的数量，最后输出模型的质量与epoch的数量密切相关。epoch=num_step*batch_size/all_images_count。具体的计算留给学员自己进行。
 
+>config文件需要跟代码一起上传，运行的时候会先被复制到output文件夹里面。
 #### 数据上传
 请学员自行在自己的tinymind账户中建立数据集。tinymind一个数据集中可以有多个不同用途的文件，这里要求学员将模型用到的所有文件，训练数据，配置，label_map等都放到一个数据集中，便于模型的使用以及助教对作业结果的判断。
 
