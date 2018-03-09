@@ -116,7 +116,7 @@ https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc
 
 这个官方的的参考文档里面，提供的是在cloud上运行一个针对宠物图片的识别框架的训练流程，本作业主要是本地和tinymind上的操作，所以运行的命令和操作方式略有不同，请学员注意区别。
 
-**由于Tensorflow1.5版本api修改，导出模型的步骤会出现错误，具体内容请参考[这里](https://github.com/tensorflow/models/pull/3106),1.4版本的RewriterConfig没有layout_optimizer这个参数，而1.5版本有这个参数。github上的代码是基于tf1.5版本的，但是tinymind上只支持最高1.4版本，请注意修改exporter.py这个文件**
+**由于Tensorflow1.5版本api修改，导出模型的步骤会出现错误，具体内容请参考[这里](https://github.com/tensorflow/models/pull/3106),1.4版本的RewriterConfig没有layout_optimizer这个参数，而1.5版本有这个参数。github上的代码是基于tf1.5版本的，但是tinymind上只支持最高1.4版本，请注意修改exporter.py这个文件，将第72行的参数layout_optimizer替换为optimize_tensor_layout**
 
 ### 关于作业中出现的错误
 **作业中，代码运行会出现一些错误，大部分可以直接搜索得到解决方案。请先自行尝试依靠搜索解决。**
