@@ -44,11 +44,18 @@ https://gitee.com/ai100/quiz-w8-data.git
 
 ### 代码
 本次代码使用tensorflow官方代码，代码地址如下：
-https://github.com/tensorflow/models.git
+https://github.com/tensorflow/models/tree/r1.5
+
+> 因为最新的代码做了一些变化，需要使用pycocotool这个库，但是这个库的安装很复杂，目前暂时无法在tinymind上进行，所以这里使用比较老版本的代码
+
 主要使用的是research/object_detection目录下的物体检测框架的代码。这个框架同时引用slim框架的部分内容，需要对运行路径做一下设置，不然会出现找不到module的错误。
 设置运行路径的方式有两种：
+
 - 直接在代码中插入路径，使用**sys.path.insert**，具体内容留作学员作业，请自行查找相关资料
+
 - 使用环境变量PYTHONPATH，参考https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/installation.md，具体内容留作学员作业，请自行查找相关资料
+
+>本次作业代码中，run.sh已经做好相关的path设置工作，在tinymind上运行可以不用考虑这个问题。
 
 ### 预训练模型
 object_detection框架提供了一些预训练的模型以加快模型训练的速度，不同的模型及检测框架的预训练模型不同，常用的模型有resnet，mobilenet以及最近google发布的nasnet，检测框架有faster_rcnn，ssd等，本次作业使用mobilenet模型ssd检测框架，其预训练模型请自行在model_zoo中查找:
@@ -63,9 +70,7 @@ https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc
 
 ### 结果评估
 
-学员在tinymind上的模型应满足以下条件可认为及格：
-
-#### 数据准备完成
+#### 数据准备完成-30分
 学员的模型引用的数据集中，应包含以下文件，文件名需要跟此处文件名一致。
 - model.ckpt.data-00000-of-00001  预训练模型相关文件
 - model.ckpt.index  预训练模型相关文件
@@ -74,7 +79,7 @@ https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc
 - pet_train.record  数据准备过程中，从原始数据生成的tfrecord格式的数据
 - pet_val.record  数据准备过程中，从原始数据生成的tfrecord格式的数据
 - test.jpg  验证图片，取任意一张训练集图片即可
-#### 训练过程正常运行并结束
+#### 训练过程正常运行并结束-30分
 出现以下log，没有明显异常退出的提示，没有明显错误：
 ```
 INFO:tensorflow:depth of additional conv before box predictor: 0
@@ -92,13 +97,20 @@ INFO:tensorflow:global step 17: loss = 9.4801 (0.209 sec/step)
 INFO:tensorflow:global step 18: loss = 9.4556 (0.219 sec/step)
 ```
 > log中出现的 deprecated WARNING，  tried to allocate 0 bytes， Request to allocate 0 bytes等内容属于框架本身的msg，不影响训练过程。
-#### 验证有结果输出
+#### 验证有结果输出-30分
 scalars有各个分类和平均AP输出。
 输出结果的output文件夹中的output.png图片内容如下。
 ![individualImage.png](individualImage.png)
-> 本作业只要框架能正确运行并输出就可以认为及格，对输出准确率不做要求。
+> 本作业只要框架能正确运行并输出就可以，对输出准确率不做要求。
+
+
+
+心得体会10分
+
+
 
 ## 要点提示
+
 本作业为开放性作业，不提供写好的代码，所有内容均由学员自己查资料完成。为避免学员因对流程的不熟悉浪费太多的时间，这里提供一些关键流程的要点提示。本作业主要参考：
 https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/running_pets.md
 
